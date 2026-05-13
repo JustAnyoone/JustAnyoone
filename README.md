@@ -21,6 +21,10 @@ Stack de Tecnologias
 <div align="center">
 Linguagens
 <img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/32398c2e-64e3-40a8-a708-c8170f4722b3" />
+
+            <i class="devicon-javascript-plain colored"></i>
+          
+  
 </div>
 
 Estatísticas GitHub
