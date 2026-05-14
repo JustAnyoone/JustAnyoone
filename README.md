@@ -19,19 +19,12 @@ Disponível para: Estágios
 
 Stack de Tecnologias
 <div align="center">
-Linguagens
-<img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/32398c2e-64e3-40a8-a708-c8170f4722b3" />
+Linguagens <br>
 
-            <i class="devicon-javascript-plain colored"></i>
-          
-  
-</div>
-
-Estatísticas GitHub
-<div align="center">
-Show Image
-Show Image
-</div>
+<img width="100" height="100" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" />        
+<img width="100" height="100" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" />
+<img width="100" height="100" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" />
+<img width="100" height="100" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" />
 
 Site do Portfólio
 Este repositório conta com uma página web estática hospedada via GitHub Pages, integrando:
