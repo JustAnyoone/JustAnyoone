@@ -5,7 +5,7 @@
 ![Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,100:58a6ff&height=200&section=header&text=Bem-vindo%20ao%20meu%20Portfólio&fontSize=36&fontColor=ffffff&animation=fadeIn)
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rhyan-portilho-60305b343/)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://JustAnyoone.github.io)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://justanyoone.github.io/GitPage/)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:rhyan.portilho@gmail.com)
 
 </div>
@@ -93,7 +93,7 @@ Este repositório conta com uma página web estática hospedada via **GitHub Pag
 - Formulário de contato
 - Design responsivo
 
-Acesse em: [https://JustAnyoone.github.io](https://JustAnyoone.github.io)
+Acesse em: [https://JustAnyoone.github.io](https://justanyoone.github.io/GitPage/)
 
 ---
 
