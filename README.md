@@ -5,7 +5,6 @@
 ![Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,100:58a6ff&height=200&section=header&text=Bem-vindo%20ao%20meu%20Portfólio&fontSize=36&fontColor=ffffff&animation=fadeIn)
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rhyan-portilho-60305b343/)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://justanyoone.github.io/GitPage/)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:rhyan.portilho@gmail.com)
 
 </div>
@@ -14,13 +13,14 @@
 
 ## Sobre Mim
 
-> *"A tecnologia não resolve problemas — pessoas que entendem tecnologia resolvem."*
+> *"Estejam vigilantes, permaneçam firmes na fé, sejam corajosos, sejam fortes. Façam tudo com amor." — 1 Coríntios 16:13-14 (NVI)*
 
-Olá! Sou **Portilho**, estudante de **Ciência da Computação** no **UniCEUB**. Apaixonado por tecnologia, desenvolvimento de software, inteligência artificial e resolução de problemas complexos através de código. Este repositório reúne minha trajetória acadêmica e projetos pessoais, refletindo meu crescimento contínuo como profissional de TI.
+Olá, Me chamo **Portilho**, estudante de **Ciência da Computação** no **UniCEUB**. Apaixonado por tecnologia, desenvolvimento de software, inteligência artificial e resolução de problemas complexos através de código. Este repositório reúne minha trajetória acadêmica e projetos pessoais, refletindo meu crescimento contínuo como profissional de TI.
 
-- Cursando **Ciência da Computação** — UniCEUB, 1º semestre
+- Cursando **Ciência da Computação** — UniCEUB, 2º semestre
 - Localização: Brasília, DF, Brasil
-- Aprendendo: **Python**
+- Inglês: Intermediário
+- Aprendendo: **Java**
 - Disponível para: Estágios
 
 ---
@@ -37,10 +37,6 @@ portfolio/
 │   ├── web/
 │   ├── scripts/
 │   └── experimentos/
-├── docs/               # Documentação, slides e relatórios
-│   ├── apresentacoes/
-│   └── relatorios/
-├── site/               # Código-fonte do GitHub Pages
 └── README.md           # Este arquivo
 ```
 
@@ -62,6 +58,7 @@ Este repositório está em construção. Os projetos serão adicionados ao longo
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
 ### Ferramentas e Plataformas
 ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
@@ -69,41 +66,6 @@ Este repositório está em construção. Os projetos serão adicionados ao longo
 ![VS Code](https://img.shields.io/badge/VS%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white)
 
 </div>
-
----
-
-## Estatísticas GitHub
-
-<div align="center">
-
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=JustAnyoone&show_icons=true&theme=github_dark&hide_border=true&locale=pt-br)
-
-![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=JustAnyoone&layout=compact&theme=github_dark&hide_border=true&locale=pt-br)
-
-</div>
-
----
-
-## Site do Portfólio
-
-Este repositório conta com uma página web estática hospedada via **GitHub Pages**, integrando:
-
-- Listagem e links para todos os projetos
-- Documentos e slides acadêmicos
-- Formulário de contato
-- Design responsivo
-
-Acesse em: [https://JustAnyoone.github.io](https://justanyoone.github.io/GitPage/)
-
----
-
-## Documentação
-
-Os documentos e materiais produzidos durante o projeto estão na pasta [`/docs`](./docs/), incluindo:
-
-- Slides de apresentações
-- Relatórios técnicos
-- Diagramas e fluxogramas
 
 ---
 
