@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,100:58a6ff&height=200&section=header&text=Bem-vindo%20ao%20meu%20Portfólio&fontSize=36&fontColor=ffffff&animation=fadeIn)
-
+![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=16&pause=1000&color=58A6FF&background=0D111700&center=false&vCenter=true&multiline=true&width=500&height=150&lines=public+class+HelloWorld+%7B;+++++public+static+void+main(String%5B%5D+args)+%7B;+++++++++System.out.println(%22Hello%2C+World!%22)%3B;+++++%7D;%7D)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rhyan-portilho-60305b343/)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:rhyan.portilho@gmail.com)
 
