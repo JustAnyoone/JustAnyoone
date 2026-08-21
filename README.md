@@ -3,6 +3,7 @@
 <div align="center">
 
 ![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=16&pause=1000&color=58A6FF&background=0D111700&center=false&vCenter=true&multiline=true&width=500&height=150&lines=public+class+HelloWorld+%7B;+++++public+static+void+main(String%5B%5D+args)+%7B;+++++++++System.out.println(%22Hello%2C+World!%22)%3B;+++++%7D;%7D)
+
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rhyan-portilho-60305b343/)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:rhyan.portilho@gmail.com)
 
@@ -19,7 +20,7 @@ Olá, Me chamo **Portilho**, estudante de **Ciência da Computação** no **UniC
 - Cursando **Ciência da Computação** — UniCEUB, 2º semestre
 - Localização: Brasília, DF, Brasil
 - Inglês: Intermediário
-- Aprendendo: **Java**
+- Especializando: **Java**
 - Disponível para: Estágios
 
 ---
@@ -33,8 +34,7 @@ portfolio/
 │   ├── semestre-02/
 │   └── tcc/
 ├── pessoal/            # Projetos de iniciativa própria
-│   ├── web/
-│   ├── scripts/
+│   ├── Java/
 │   └── experimentos/
 └── README.md           # Este arquivo
 ```
@@ -52,9 +52,9 @@ Este repositório está em construção. Os projetos serão adicionados ao longo
 <div align="center">
 
 ### Linguagens
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
