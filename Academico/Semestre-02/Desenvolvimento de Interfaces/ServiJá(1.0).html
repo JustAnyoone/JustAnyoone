@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiJá - O jeito mais fácil de resolver o que você precisa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#1d4ed8',
+                            600: '#0055ff',
+                            700: '#0044cc',
+                            800: '#1e40af',
+                        },
+                        provider: {
+                            500: '#00a86b',
+                            600: '#008756',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            user-select: none;
+        }
+
+        /* Custom scrollbar for mobile screen simulator */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .phone-frame {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 12px #1e293b;
+            border-radius: 40px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .ios-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 28px;
+            background-color: #1e293b;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 50;
+        }
+
+        .screen-fade {
+            animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast styling */
+        .toast {
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-6 text-slate-800">
+
+    <!-- Top Global Switcher Bar -->
+    <header class="w-full max-w-6xl bg-white rounded-2xl p-4 mb-6 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4 z-40">
+        <div class="flex items-center gap-3">
+            <div class="bg-brand-600 text-white p-2.5 rounded-xl flex items-center justify-center font-bold text-xl shadow-md shadow-brand-600/30">
+                <i class="fa-solid fa-handshake-angle text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-2xl tracking-tight text-slate-900 leading-none">Servi<span class="text-brand-600">Já</span></h1>
+                <p class="text-xs text-slate-500 mt-1">Protótipo Interativo Multiusuário</p>
+            </div>
+        </div>
+
+        <!-- Role Selectors -->
+        <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+            <button onclick="switchRole('CLIENTE')" id="btn-role-cliente" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-brand-600 text-white shadow-sm">
+                <i class="fa-solid fa-user"></i>
+                <span>Visão Cliente</span>
+            </button>
+            <button onclick="switchRole('PRESTADOR')" id="btn-role-prestador" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Visão Prestador</span>
+            </button>
+            <button onclick="switchRole('ADMIN')" id="btn-role-admin" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Painel Admin</span>
+            </button>
+        </div>
+
+        <!-- View Display Mode Toggle -->
+        <div class="hidden md:flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs font-semibold">
+            <button onclick="toggleDeviceFrame(true)" id="btn-frame-mobile" class="px-3 py-1.5 rounded-lg bg-white shadow-xs text-slate-800 font-bold">
+                <i class="fa-solid fa-mobile-screen mr-1"></i> Telas do App
+            </button>
+            <button onclick="toggleDeviceFrame(false)" id="btn-frame-full" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 font-normal">
+                <i class="fa-solid fa-desktop mr-1"></i> Expansão Total
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <main id="app-container" class="w-full flex justify-center items-center">
+        
+        <!-- Mobile Frame Wrapper -->
+        <div id="device-wrapper" class="phone-frame relative bg-white w-full max-w-[410px] h-[820px] flex flex-col border-[6px] border-slate-800 shadow-2xl">
+            
+            <!-- iOS Status Bar Simulation -->
+            <div class="ios-notch"></div>
+            <div class="w-full pt-2 px-6 pb-1 bg-white flex justify-between items-center text-[11px] font-semibold text-slate-800 z-40 select-none">
+                <span>09:41</span>
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-signal"></i>
+                    <i class="fa-solid fa-wifi"></i>
+                    <i class="fa-solid fa-battery-full text-xs"></i>
+                </div>
+            </div>
+
+            <!-- DYNAMIC SCREEN CONTENT AREA -->
+            <div id="screen-content" class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col bg-slate-50 pt-2">
+                <!-- Content injected via JS -->
+            </div>
+
+            <!-- Bottom Navigation Bar (Contextual) -->
+            <nav id="bottom-nav" class="w-full bg-white border-t border-slate-200 py-2 px-4 flex justify-around items-center z-40">
+                <!-- Navigation Items injected dynamically based on current role -->
+            </nav>
+        </div>
+    </main>
+
+    <!-- Global Toast Notification Element -->
+    <div id="toast" class="toast fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 z-50 text-sm border border-slate-700">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message">Ação realizada com sucesso!</span>
+    </div>
+
+    <script>
+        /* Global Application State */
+        const state = {
+            currentRole: 'CLIENTE', // CLIENTE | PRESTADOR | ADMIN
+            currentScreen: 'ONBOARDING', // CLIENTE screens: ONBOARDING, HOME, NEW_REQUEST, PROPOSALS, PROVIDER_PROFILE, CLIENT_PROFILE, CHAT
+                                         // PRESTADOR screens: HOME_PRESTADOR, OPPORTUNITIES, SEND_PROPOSAL, MY_SERVICES, PROFILE_PRESTADOR
+                                         // ADMIN screens: ADMIN_DASHBOARD, ADMIN_REQUESTS
+            deviceFrameMode: true,
+            selectedCategory: 'Elétrica',
+            selectedRequest: null,
+            selectedProvider: null,
+            onlyFemaleProviders: false, // Filtro de preferência por prestadoras mulheres
+            isUrgentMode: false, // Modo de atendimento emergencial
+            providerOnline: true, // Estado: prestador online
+            adminChartInstance: null,
+            
+            // Client Profile Info
+            clientUser: {
+                name: 'Mariana Silva',
+                email: 'mariana.silva@email.com',
+                phone: '(11) 98765-4321',
+                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+                rating: 4.9,
+                totalRequests: 14,
+                activeRequests: 4,
+                address: 'Rua das Flores, 123 - São Paulo, SP'
+            },
+
+            // Serviços Agendados para a visão do Prestador
+            scheduledServices: [
+                {
+                    id: 'SCH-01',
+                    title: 'Instalação de Chuveiro Elétrico',
+                    clientName: 'Mariana Silva',
+                    clientInitials: 'MS',
+                    address: 'Rua das Flores, 123 - São Paulo, SP',
+                    date: 'Amanhã',
+                    time: '09:00 - 10:00',
+                    price: 'R$ 120,00',
+                    badgeColor: 'bg-emerald-500'
+                },
+                {
+                    id: 'SCH-02',
+                    title: 'Troca de Quadro de Disjuntores',
+                    clientName: 'Roberto Almeida',
+                    clientInitials: 'RA',
+                    address: 'Av. Paulista, 1500 - Ap 82 - São Paulo, SP',
+                    date: 'Amanhã',
+                    time: '14:00 - 16:30',
+                    price: 'R$ 350,00',
+                    badgeColor: 'bg-blue-500'
+                },
+                {
+                    id: 'SCH-03',
+                    title: 'Instalação de 6 Luminárias LED e Fita',
+                    clientName: 'Camila Fernandes',
+                    clientInitials: 'CF',
+                    address: 'Rua Augusta, 890 - Consolação, SP',
+                    date: '18/05/2026',
+                    time: '10:30 - 12:30',
+                    price: 'R$ 220,00',
+                    badgeColor: 'bg-indigo-500'
+                },
+                {
+                    id: 'SCH-04',
+                    title: 'Reparo em Curto-Circuito na Cozinha',
+                    clientName: 'Lucas Gonzaga',
+                    clientInitials: 'LG',
+                    address: 'Rua Oscar Freire, 410 - Pinheiros, SP',
+                    date: '19/05/2026',
+                    time: '08:30 - 10:00',
+                    price: 'R$ 180,00',
+                    badgeColor: 'bg-amber-500'
+                }
+            ],
+            
+            // Dynamic Data Stores
+            requests: [
+                {
+                    id: 'REQ-100',
+                    category: 'Hidráulica',
+                    title: 'Cano estourado na cozinha (Emergência)',
+                    description: 'Cano estourou de repente sob a pia e está vazando muita água. Preciso de socorro o mais rápido possível!',
+                    location: 'Rua das Flores, 123 - São Paulo, SP',
+                    distance: '1,1 km',
+                    date: 'Hoje (Imediato)',
+                    timeSlot: 'O mais cedo possível',
+                    budget: 'A combinar (Urgente)',
+                    status: 'Aberto',
+                    createdAt: 'Criado há 5 min',
+                    isUrgent: true,
+                    proposalsCount: 1,
+                    proposals: [
+                        {
+                            id: 'PROP-SOS-1',
+                            providerName: 'Marcos Encanador SOS 24h',
+                            providerAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200',
+                            rating: 4.9,
+                            reviewsCount: 210,
+                            value: 'R$ 190,00',
+                            distance: '1.1 km',
+                            comment: 'Estou com equipe de prontidão no seu bairro! Chego no local em até 20 a 30 minutos.',
+                            completedJobs: 340,
+                            completionRate: '99%',
+                            experience: '10 anos',
+                            gender: 'male'
+                        }
+                    ]
+                },
+                {
+                    id: 'REQ-101',
+                    category: 'Elétrica',
+                    title: 'Instalar tomadas e interruptores',
+                    description: 'Preciso trocar 4 tomadas antigas da sala e instalar 2 novos interruptores paralelos.',
+                    location: 'Rua das Flores, 123 - São Paulo, SP',
+                    distance: '2,3 km',
+                    date: '16/05/2026',
+                    timeSlot: 'Manhã (8h - 12h)',
+                    budget: 'R$ 150 - R$ 200',
+                    status: 'Aberto',
+                    createdAt: 'Criado em 12/05/2026',
+                    isUrgent: false,
+                    proposalsCount: 3,
+                    proposals: [
+                        {
+                            id: 'PROP-3',
+                            providerName: 'Ana Paula Elétrica & Reparos',
+                            providerAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200',
+                            rating: 4.95,
+                            reviewsCount: 142,
+                            value: 'R$ 170,00',
+                            distance: '1.8 km',
+                            comment: 'Especialista em instalações elétricas e manutenção residencial. Garantia de pontualidade, higiene e atendimento com total segurança.',
+                            completedJobs: 156,
+                            completionRate: '99%',
+                            experience: '6 anos',
+                            gender: 'female'
+                        },
+                        {
+                            id: 'PROP-1',
+                            providerName: 'Carlos Eletricista',
+                            providerAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200',
+                            rating: 4.9,
+                            reviewsCount: 128,
+                            value: 'R$ 180,00',
+                            distance: '2.3 km',
+                            comment: 'Estou disponível na data solicitada e posso realizar o serviço com qualidade e segurança.',
+                            completedJobs: 128,
+                            completionRate: '98%',
+                            experience: '8 anos',
+                            gender: 'male'
+                        },
+                        {
+                            id: 'PROP-2',
+                            providerName: 'Elétrica Luz Ltda',
+                            providerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+                            rating: 4.7,
+                            reviewsCount: 95,
+                            value: 'R$ 150,00',
+                            distance: '3.1 km',
+                            comment: 'Temos experiência e garantimos um serviço de qualidade com emissão de nota.',
+                            completedJobs: 95,
+                            completionRate: '96%',
+                            experience: '5 anos',
+                            gender: 'male'
+                        }
+                    ]
+                },
+                {
+                    id: 'REQ-102',
+                    category: 'Hidráulica',
+                    title: 'Troca de torneira e reparo em vazamento',
+                    description: 'Vazamento sob o sifão da pia da cozinha e instalação de torneira nova.',
+                    location: 'Av. Paulista, 500 - São Paulo, SP',
+                    distance: '3,1 km',
+                    date: '17/05/2026',
+                    timeSlot: 'Tarde (13h - 18h)',
+                    budget: 'R$ 120 - R$ 180',
+                    status: 'Em andamento',
+                    createdAt: 'Criado em 14/05/2026',
+                    isUrgent: false,
+                    proposalsCount: 1,
+                    proposals: []
+                },
+                {
+                    id: 'REQ-103',
+                    category: 'Montagem',
+                    title: 'Montagem de guarda-roupa 6 portas',
+                    description: 'Preciso da montagem de um guarda-roupa de casal novo em MDF, 6 portas e 4 gavetas.',
+                    location: 'Rua das Flores, 123 - São Paulo, SP',
+                    distance: '1,8 km',
+                    date: '10/05/2026',
+                    timeSlot: 'Manhã (8h - 12h)',
+                    budget: 'R$ 150,00',
+                    status: 'Concluído',
+                    createdAt: 'Concluído há 2 dias',
+                    isUrgent: false,
+                    proposalsCount: 4,
+                    proposals: []
+                }
+            ],
+            chatMessages: [
+                { sender: 'provider', text: 'Olá, Mariana! Recebi sua solicitação para a troca das tomadas e instalação dos interruptores. Tenho disponibilidade para realizar o serviço.', time: '10:20' },
+                { sender: 'client', text: 'Bom dia, Carlos! Que ótimo. Você traz o material ou eu preciso comprar?', time: '10:32' },
+                { sender: 'provider', text: 'A proposta inclui apenas a mão de obra. As novas tomadas vão ser padrão de 10A ou você tem equipamentos pesados (microondas/aquecedor) que precisem de 20A?', time: '10:35' },
+                { sender: 'client', text: 'Na sala acho que 10A resolve, é mais para TV e carregador de celular.', time: '10:40' },
+                { sender: 'provider', text: 'Perfeito! E sobre os interruptores paralelos, já tem a fiação passada ou vou precisar de um passa-fio? Mando aqui um exemplo do modelo de placa que costumo indicar.', time: '10:42' },
+                { sender: 'provider', image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=400', time: '10:43' },
+                { sender: 'client', text: 'A fiação antiga está lá, dá pra usar o conduíte. Gostei desse modelo, vamos fechar!', time: '10:45' }
+            ]
+        };
+
+        function showToast(msg, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const message = document.getElementById('toast-message');
+
+            message.textContent = msg;
+            icon.className = isSuccess ? 'fa-solid fa-circle-check text-emerald-400 text-lg' : 'fa-solid fa-circle-exclamation text-amber-400 text-lg';
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function toggleDeviceFrame(isMobile) {
+            state.deviceFrameMode = isMobile;
+            const wrapper = document.getElementById('device-wrapper');
+            const btnMobile = document.getElementById('btn-frame-mobile');
+            const btnFull = document.getElementById('btn-frame-full');
+
+            if (isMobile) {
+                wrapper.className = "phone-frame relative bg-white w-full max-w-[410px] h-[820px] flex flex-col border-[6px] border-slate-800 shadow-2xl";
+                btnMobile.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-slate-800 font-bold";
+                btnFull.className = "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 font-normal";
+            } else {
+                wrapper.className = "relative bg-white w-full max-w-4xl h-[820px] rounded-3xl flex flex-col border border-slate-300 shadow-xl overflow-hidden";
+                btnFull.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-slate-800 font-bold";
+                btnMobile.className = "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 font-normal";
+            }
+        }
+
+        function switchRole(role) {
+            state.currentRole = role;
+            
+            // Update Top Bar styling
+            document.getElementById('btn-role-cliente').className = role === 'CLIENTE' ? 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-brand-600 text-white shadow-sm' : 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900';
+            document.getElementById('btn-role-prestador').className = role === 'PRESTADOR' ? 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-emerald-600 text-white shadow-sm' : 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900';
+            document.getElementById('btn-role-admin').className = role === 'ADMIN' ? 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-indigo-600 text-white shadow-sm' : 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900';
+
+            if (role === 'CLIENTE') {
+                navigate('HOME');
+            } else if (role === 'PRESTADOR') {
+                navigate('HOME_PRESTADOR');
+            } else if (role === 'ADMIN') {
+                navigate('ADMIN_DASHBOARD');
+            }
+        }
+
+        function navigate(screenKey, payload = null) {
+            state.currentScreen = screenKey;
+            if (payload) {
+                if (payload.request) state.selectedRequest = payload.request;
+                if (payload.provider) state.selectedProvider = payload.provider;
+            }
+            render();
+        }
+
+        function toggleUrgentMode(checked) {
+            state.isUrgentMode = checked;
+            render();
+        }
+
+        function openEmergencyRequest() {
+            state.isUrgentMode = true;
+            state.selectedCategory = 'Hidráulica';
+            navigate('NEW_REQUEST');
+        }
+
+        function handleCreateRequest(e) {
+            e.preventDefault();
+            const cat = document.getElementById('req-cat').value;
+            const title = document.getElementById('req-title').value;
+            const desc = document.getElementById('req-desc').value;
+            const loc = document.getElementById('req-loc').value;
+            const date = document.getElementById('req-date').value;
+            const time = document.getElementById('req-time').value;
+            const budget = document.getElementById('req-budget').value;
+            const isUrgent = document.getElementById('req-is-urgent').checked;
+
+            const newReq = {
+                id: 'REQ-' + Math.floor(100 + Math.random() * 900),
+                category: cat,
+                title: title,
+                description: desc,
+                location: loc,
+                distance: '1,2 km',
+                date: date,
+                timeSlot: time,
+                budget: budget || 'A combinar',
+                status: 'Aberto',
+                createdAt: 'Agora mesmo',
+                isUrgent: isUrgent,
+                proposalsCount: 0,
+                proposals: []
+            };
+
+            state.requests.unshift(newReq);
+            state.clientUser.totalRequests += 1;
+            state.clientUser.activeRequests += 1;
+            
+            showToast(isUrgent ? 'Chamado de Emergência publicado!' : 'Solicitação criada com sucesso!');
+            navigate('PROPOSALS', { request: newReq });
+        }
+
+        function handleHireProvider(providerName) {
+            showToast(`Proposta de ${providerName} aceita!`);
+            navigate('CHAT');
+        }
+
+        function handleSendMessage() {
+            const input = document.getElementById('chat-input');
+            if (!input || !input.value.trim()) return;
+
+            const text = input.value.trim();
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            state.chatMessages.push({
+                sender: 'client',
+                text: text,
+                time: timeStr
+            });
+
+            input.value = '';
+            render();
+        }
+
+        function handleSendProposalSubmit(e) {
+            e.preventDefault();
+            showToast('Sua proposta foi enviada ao cliente com sucesso!');
+            navigate('HOME_PRESTADOR');
+        }
+
+        function renderClienteScreen() {
+            const content = document.getElementById('screen-content');
+
+            switch (state.currentScreen) {
+                case 'ONBOARDING':
+                    content.innerHTML = `
+                        <div class="screen-fade min-h-full p-6 flex flex-col justify-between bg-white text-center">
+                            <div class="pt-8">
+                                <div class="w-16 h-16 bg-brand-600 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-lg shadow-brand-600/30 mb-4">
+                                    <i class="fa-solid fa-handshake-angle"></i>
+                                </div>
+                                <h1 class="text-3xl font-extrabold text-slate-900">Servi<span class="text-brand-600">Já</span></h1>
+                                <p class="text-slate-500 text-xs mt-2 font-medium">O jeito mais fácil de resolver o que você precisa.</p>
+                            </div>
+
+                            <div class="space-y-4 my-auto py-6">
+                                <button onclick="navigate('HOME')" class="w-full bg-brand-600 hover:bg-brand-700 text-white p-4 rounded-2xl font-bold flex items-center justify-between shadow-lg shadow-brand-600/20 transition-all">
+                                    <div class="text-left">
+                                        <div class="text-base">Preciso de um serviço</div>
+                                        <div class="text-xs text-brand-100 font-normal">Encontre os melhores profissionais perto de você.</div>
+                                    </div>
+                                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </button>
+
+                                <button onclick="switchRole('PRESTADOR')" class="w-full bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-800 p-4 rounded-2xl font-bold flex items-center justify-between transition-all">
+                                    <div class="text-left">
+                                        <div class="text-base">Quero prestar serviços</div>
+                                        <div class="text-xs text-slate-500 font-normal">Encontre novos clientes e faça seu negócio crescer.</div>
+                                    </div>
+                                    <div class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-600">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div class="text-xs text-slate-400">
+                                Já tem uma conta? <a href="#" onclick="navigate('HOME'); return false;" class="text-brand-600 font-semibold">Entrar</a>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'HOME':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <!-- Header Bar -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                    <i class="fa-solid fa-location-dot text-brand-600"></i>
+                                    <span>São Paulo, SP</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                                </div>
+                                <div class="relative">
+                                    <i class="fa-regular fa-bell text-slate-600 text-lg"></i>
+                                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                </div>
+                            </div>
+
+                            <!-- SOS Emergency Banner -->
+                            <div onclick="openEmergencyRequest()" class="bg-gradient-to-r from-red-600 via-red-500 to-rose-600 rounded-2xl p-3.5 text-white flex items-center justify-between shadow-lg shadow-red-500/20 border border-red-400/30 cursor-pointer hover:scale-[1.01] transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-black animate-pulse">
+                                        🚨
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-extrabold text-xs tracking-wide uppercase text-red-100">Serviço de Emergência</span>
+                                            <span class="bg-white text-red-600 text-[9px] font-black px-1.5 py-0.2 rounded-full">24H</span>
+                                        </div>
+                                        <h3 class="font-bold text-xs mt-0.5 leading-tight">Precisa de socorro o mais cedo possível?</h3>
+                                        <p class="text-[10px] text-red-100 opacity-90">Chame prestadores disponíveis agora</p>
+                                    </div>
+                                </div>
+                                <div class="w-7 h-7 bg-white text-red-600 rounded-full flex items-center justify-center text-xs font-bold shadow-md">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Search Input -->
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                                <input type="text" placeholder="Buscar serviços (ex: eletricista, pintura...)" class="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:outline-none focus:border-brand-600 shadow-xs">
+                            </div>
+
+                            <!-- Promotional Banner -->
+                            <div class="bg-gradient-to-r from-brand-600 to-blue-700 rounded-2xl p-4 text-white relative overflow-hidden shadow-md">
+                                <div class="max-w-[65%]">
+                                    <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Precisou?</span>
+                                    <h2 class="font-bold text-sm mt-1 leading-tight">A gente te conecta com os melhores profissionais.</h2>
+                                </div>
+                                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=200" class="absolute -right-2 -bottom-2 w-28 h-28 object-cover rounded-full border-4 border-white/10 opacity-90">
+                            </div>
+
+                            <!-- Service Categories Grid -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="font-bold text-sm text-slate-800">Categorias</h3>
+                                    <a href="#" class="text-xs text-brand-600 font-semibold">Ver todas</a>
+                                </div>
+                                <div class="grid grid-cols-4 gap-3 text-center">
+                                    ${[
+                                        { name: 'Elétrica', icon: 'fa-bolt', color: 'text-amber-500 bg-amber-50' },
+                                        { name: 'Hidráulica', icon: 'fa-faucet-drip', color: 'text-blue-500 bg-blue-50' },
+                                        { name: 'Pintura', icon: 'fa-paint-roller', color: 'text-orange-500 bg-orange-50' },
+                                        { name: 'Limpeza', icon: 'fa-broom', color: 'text-emerald-500 bg-emerald-50' },
+                                        { name: 'Montagem', icon: 'fa-screwdriver-wrench', color: 'text-purple-500 bg-purple-50' },
+                                        { name: 'Jardinagem', icon: 'fa-seedling', color: 'text-green-500 bg-green-50' },
+                                        { name: 'Ar Cond.', icon: 'fa-snowflake', color: 'text-sky-500 bg-sky-50' },
+                                        { name: 'Ver mais', icon: 'fa-ellipsis', color: 'text-slate-500 bg-slate-100' }
+                                    ].map(cat => `
+                                        <div onclick="state.selectedCategory='${cat.name}'; state.isUrgentMode=false; navigate('NEW_REQUEST');" class="bg-white p-2.5 rounded-2xl border border-slate-100 shadow-xs flex flex-col items-center cursor-pointer hover:border-brand-500 transition-all">
+                                            <div class="w-10 h-10 ${cat.color} rounded-xl flex items-center justify-center text-lg mb-1.5">
+                                                <i class="fa-solid ${cat.icon}"></i>
+                                            </div>
+                                            <span class="text-[10px] font-semibold text-slate-700 leading-tight">${cat.name}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Recent Requests Widget -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="font-bold text-sm text-slate-800">Solicitações recentes</h3>
+                                    <a href="#" class="text-xs text-brand-600 font-semibold">Ver todas</a>
+                                </div>
+                                ${state.requests.map(reqItem => `
+                                    <div onclick="navigate('PROPOSALS', { request: state.requests.find(r => r.id === '${reqItem.id}') })" class="bg-white p-3.5 rounded-2xl border ${reqItem.status === 'Concluído' ? 'border-slate-100 opacity-75' : (reqItem.isUrgent ? 'border-red-300 ring-1 ring-red-200' : 'border-slate-200')} shadow-xs mb-2 cursor-pointer hover:border-brand-500 transition-all">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 ${reqItem.status === 'Concluído' ? 'bg-slate-100 text-slate-400' : (reqItem.isUrgent ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600')} rounded-xl flex items-center justify-center text-lg">
+                                                    <i class="fa-solid ${reqItem.status === 'Concluído' ? 'fa-check' : (reqItem.isUrgent ? 'fa-triangle-exclamation' : 'fa-bolt')}"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center gap-1.5">
+                                                        <h4 class="font-bold text-xs ${reqItem.status === 'Concluído' ? 'text-slate-500 line-through decoration-slate-300' : 'text-slate-900'}">${reqItem.title}</h4>
+                                                    </div>
+                                                    <p class="text-[10px] text-slate-500 mt-0.5">
+                                                        ${reqItem.isUrgent ? '<span class="text-red-600 font-bold">🚨 Atendimento Imediato</span> • ' : ''}${reqItem.createdAt}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span class="${reqItem.status === 'Concluído' ? 'bg-slate-100 text-slate-500 font-bold' : (reqItem.isUrgent ? 'bg-red-100 text-red-700 font-black' : 'bg-emerald-50 text-emerald-600 font-bold')} text-[10px] px-2 py-1 rounded-lg">
+                                                ${reqItem.status === 'Concluído' ? 'Concluído' : reqItem.proposalsCount + ' propostas'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'NEW_REQUEST':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex items-center gap-3">
+                                <button onclick="navigate('HOME')" class="w-8 h-8 rounded-full bg-slate-200/60 flex items-center justify-center text-slate-600">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <div>
+                                    <h2 class="font-bold text-base text-slate-900">Nova solicitação</h2>
+                                    <p class="text-[10px] text-slate-500">Descreva o que precisa ser feito</p>
+                                </div>
+                            </div>
+
+                            <form id="form-new-request" onsubmit="handleCreateRequest(event)" class="space-y-3">
+                                
+                                <!-- Emergencia / Urgência Toggle -->
+                                <div class="p-3 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl flex items-center justify-between shadow-xs">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                                            <i class="fa-solid fa-bolt"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="block text-xs font-extrabold text-slate-900">Serviço de Emergência / Urgente</span>
+                                                <span class="bg-red-600 text-white text-[8px] font-black px-1 rounded">SOS</span>
+                                            </div>
+                                            <span class="block text-[10px] text-red-700 font-medium">Preciso de atendimento o mais cedo possível!</span>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="req-is-urgent" class="sr-only peer" ${state.isUrgentMode ? 'checked' : ''} onchange="toggleUrgentMode(this.checked)">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                                    </label>
+                                </div>
+
+                                <!-- Preferência Atendimento Feminino Toggle -->
+                                <div class="p-3 bg-pink-50 border border-pink-200 rounded-xl flex items-center justify-between">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center font-bold">
+                                            <i class="fa-solid fa-venus text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <span class="block text-xs font-bold text-slate-900">Preferência por Prestadora Mulher</span>
+                                            <span class="block text-[10px] text-pink-700 font-medium">Exibir propostas de profissionais do gênero feminino</span>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="req-female-only" class="sr-only peer" ${state.onlyFemaleProviders ? 'checked' : ''} onchange="state.onlyFemaleProviders = this.checked">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Categoria</label>
+                                    <select id="req-cat" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-800">
+                                        <option value="Elétrica" ${state.selectedCategory === 'Elétrica' ? 'selected' : ''}>⚡ Elétrica</option>
+                                        <option value="Hidráulica" ${state.selectedCategory === 'Hidráulica' ? 'selected' : ''}>🚰 Hidráulica</option>
+                                        <option value="Pintura" ${state.selectedCategory === 'Pintura' ? 'selected' : ''}>🎨 Pintura</option>
+                                        <option value="Limpeza" ${state.selectedCategory === 'Limpeza' ? 'selected' : ''}>🧹 Limpeza</option>
+                                        <option value="Montagem" ${state.selectedCategory === 'Montagem' ? 'selected' : ''}>🔧 Montagem de Móveis</option>
+                                        <option value="Desentupimento" ${state.selectedCategory === 'Desentupimento' ? 'selected' : ''}>🚽 Desentupimento (Urgente)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Título do serviço</label>
+                                    <input id="req-title" required type="text" placeholder="${state.isUrgentMode ? 'Ex: Vazamento urgente na cozinha / Cano estourado' : 'Ex: instalar tomadas e interruptores'}" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-800">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="block text-xs font-bold text-slate-700">Descrição do serviço</label>
+                                        <span class="text-[10px] text-slate-400">0/500</span>
+                                    </div>
+                                    <textarea id="req-desc" required rows="3" placeholder="Descreva o que precisa ser feito..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-800"></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Fotos (opcional)</label>
+                                    <div class="border-2 border-dashed border-slate-200 bg-white rounded-xl p-3.5 text-center cursor-pointer hover:bg-slate-50">
+                                        <i class="fa-solid fa-camera text-slate-400 text-lg mb-1"></i>
+                                        <p class="text-[11px] font-semibold text-brand-600">Adicionar fotos do problema</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Localização</label>
+                                    <div class="relative">
+                                        <input id="req-loc" type="text" value="Rua das Flores, 123 - São Paulo, SP" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 pr-8 text-xs font-medium text-slate-800">
+                                        <i class="fa-solid fa-location-crosshairs absolute right-3 top-3 text-slate-400 text-xs"></i>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Data do atendimento</label>
+                                        <input id="req-date" type="text" value="${state.isUrgentMode ? 'Hoje (Imediato)' : '16/05/2026'}" class="w-full ${state.isUrgentMode ? 'bg-red-50 font-bold text-red-700 border-red-300' : 'bg-white'} border border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Horário desejado</label>
+                                        <select id="req-time" class="w-full ${state.isUrgentMode ? 'bg-red-50 font-bold text-red-700 border-red-300' : 'bg-white'} border border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-800">
+                                            ${state.isUrgentMode ? '<option selected>🚨 O mais cedo possível (SOS)</option>' : ''}
+                                            <option>Manhã (8h - 12h)</option>
+                                            <option>Tarde (13h - 18h)</option>
+                                            <option>Noite (18h - 22h)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Orçamento estimado (opcional)</label>
+                                    <input id="req-budget" type="text" placeholder="Até R$" value="${state.isUrgentMode ? 'A combinar (Emergência)' : 'Até R$ 200'}" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-800">
+                                </div>
+
+                                <button type="submit" class="w-full ${state.isUrgentMode ? 'bg-red-600 hover:bg-red-700 shadow-red-500/30' : 'bg-brand-600 hover:bg-brand-700 shadow-brand-600/20'} text-white font-bold p-3.5 rounded-xl shadow-lg text-xs transition-all mt-4 flex items-center justify-center gap-2">
+                                    ${state.isUrgentMode ? '<i class="fa-solid fa-bolt"></i> Chamado de Emergência Agilizado' : 'Publicar solicitação'}
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                    break;
+
+                case 'PROPOSALS':
+                    const req = state.selectedRequest || state.requests[0];
+                    const displayedProposals = req.proposals.filter(p => !state.onlyFemaleProviders || p.gender === 'female');
+                    
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex items-center gap-3">
+                                <button onclick="navigate('HOME')" class="w-8 h-8 rounded-full bg-slate-200/60 flex items-center justify-center text-slate-600">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <h2 class="font-bold text-base text-slate-900">Propostas recebidas</h2>
+                            </div>
+
+                            <!-- Summary Card -->
+                            <div class="bg-white p-3.5 rounded-2xl border ${req.isUrgent ? 'border-red-300 ring-2 ring-red-100' : 'border-slate-200'} shadow-xs">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Solicitação</span>
+                                    ${req.status === 'Concluído' ? `
+                                        <span class="bg-slate-100 text-slate-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                            <i class="fa-solid fa-check-double"></i> CONCLUÍDO
+                                        </span>
+                                    ` : (req.isUrgent ? `
+                                        <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                                            <i class="fa-solid fa-bolt"></i> URGENTE - SOS
+                                        </span>
+                                    ` : `
+                                        <span class="bg-emerald-100 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Aberta</span>
+                                    `)}
+                                </div>
+                                <h3 class="font-bold text-sm text-slate-900">${req.title}</h3>
+                                <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${req.location}</p>
+                                <p class="text-xs ${req.isUrgent ? 'text-red-600 font-bold' : 'text-slate-500'} mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${req.date} - ${req.timeSlot}</p>
+                            </div>
+
+                            <!-- Female Filter Bar -->
+                            <div class="flex items-center justify-between bg-pink-50 border border-pink-200 p-2.5 rounded-xl">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-venus text-pink-600 text-xs"></i>
+                                    <span class="font-bold text-xs text-pink-900">Apenas prestadoras mulheres</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" ${state.onlyFemaleProviders ? 'checked' : ''} onchange="state.onlyFemaleProviders = this.checked; render();" class="sr-only peer">
+                                    <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-pink-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-800">${displayedProposals.length} propostas exibidas</span>
+                            </div>
+
+                            <!-- Proposals List -->
+                            <div class="space-y-3">
+                                ${displayedProposals.length === 0 ? `
+                                    <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs">
+                                        <i class="fa-solid fa-user-slash text-2xl text-slate-300 mb-2"></i>
+                                        <p>Nenhuma prestadora mulher respondeu até o momento.</p>
+                                    </div>
+                                ` : ''}
+                                ${displayedProposals.map(prop => `
+                                    <div class="bg-white p-3.5 rounded-2xl border ${prop.gender === 'female' ? 'border-pink-200 ring-1 ring-pink-100' : 'border-slate-200'} shadow-xs space-y-3">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex gap-3 items-center">
+                                                <div class="relative">
+                                                    <img src="${prop.providerAvatar}" class="w-11 h-11 rounded-full object-cover border border-slate-200">
+                                                    ${prop.gender === 'female' ? `
+                                                        <span class="absolute -bottom-1 -right-1 bg-pink-600 text-white w-4 h-4 rounded-full flex items-center justify-center text-[9px]" title="Prestadora Mulher">
+                                                            <i class="fa-solid fa-venus"></i>
+                                                        </span>
+                                                    ` : ''}
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center gap-1.5">
+                                                        <h4 class="font-bold text-xs text-slate-900">${prop.providerName}</h4>
+                                                    </div>
+                                                    ${prop.gender === 'female' ? `
+                                                        <span class="inline-block text-[9px] bg-pink-100 text-pink-700 font-bold px-1.5 py-0.5 rounded mt-0.5">
+                                                            <i class="fa-solid fa-venus mr-1"></i>Atendimento Feminino
+                                                        </span>
+                                                    ` : ''}
+                                                    <div class="flex items-center gap-1 text-[11px] text-slate-600 mt-0.5">
+                                                        <i class="fa-solid fa-star text-amber-400"></i>
+                                                        <span class="font-bold">${prop.rating}</span>
+                                                        <span class="text-slate-400">(${prop.reviewsCount} avaliações)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="font-black text-sm text-brand-600">${prop.value}</div>
+                                                <div class="text-[10px] text-slate-400 mt-0.5">${prop.distance}</div>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 italic">
+                                            "${prop.comment}"
+                                        </p>
+
+                                        <div class="grid grid-cols-2 gap-2 pt-1">
+                                            <button onclick="navigate('PROVIDER_PROFILE', { provider: ${JSON.stringify(prop).replace(/"/g, '&quot;')} })" class="w-full py-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-50">
+                                                Ver perfil
+                                            </button>
+                                            <button onclick="handleHireProvider('${prop.providerName}')" class="w-full py-2 bg-brand-600 text-white font-bold text-xs rounded-xl shadow-xs hover:bg-brand-700">
+                                                Contratar
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'PROVIDER_PROFILE':
+                    const prov = state.selectedProvider || state.requests[0].proposals[0];
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex items-center justify-between">
+                                <button onclick="navigate('PROPOSALS')" class="w-8 h-8 rounded-full bg-slate-200/60 flex items-center justify-center text-slate-600">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <h2 class="font-bold text-base text-slate-900">Perfil do prestador</h2>
+                                <div class="flex gap-2">
+                                    <i class="fa-regular fa-heart text-slate-600 cursor-pointer"></i>
+                                    <i class="fa-solid fa-share-nodes text-slate-600 cursor-pointer"></i>
+                                </div>
+                            </div>
+
+                            <!-- Provider Header Card -->
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center space-y-2 shadow-xs">
+                                <div class="relative w-20 h-20 mx-auto">
+                                    <img src="${prov.providerAvatar}" class="w-20 h-20 rounded-full object-cover mx-auto border-2 ${prov.gender === 'female' ? 'border-pink-500' : 'border-brand-600'} shadow-md">
+                                    ${prov.gender === 'female' ? `
+                                        <span class="absolute bottom-0 right-0 bg-pink-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-sm border-2 border-white" title="Prestadora Mulher">
+                                            <i class="fa-solid fa-venus"></i>
+                                        </span>
+                                    ` : ''}
+                                </div>
+                                <h3 class="font-extrabold text-base text-slate-900">${prov.providerName}</h3>
+                                ${prov.gender === 'female' ? `
+                                    <div class="inline-flex items-center gap-1 bg-pink-50 text-pink-700 border border-pink-200 px-3 py-0.5 rounded-full text-xs font-bold">
+                                        <i class="fa-solid fa-venus"></i> Prestadora Verificada • Atendimento Feminino
+                                    </div>
+                                ` : ''}
+                                <div class="flex justify-center items-center gap-1 text-xs text-slate-600">
+                                    <i class="fa-solid fa-star text-amber-400"></i>
+                                    <span class="font-bold text-slate-800">${prov.rating}</span>
+                                    <span class="text-slate-400">(${prov.reviewsCount} avaliações)</span>
+                                </div>
+                                <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1"></i>São Paulo, SP • ${prov.distance}</p>
+                            </div>
+
+                            <!-- Tabs -->
+                            <div class="flex border-b border-slate-200 text-xs font-bold text-slate-500">
+                                <div class="pb-2 border-b-2 border-brand-600 text-brand-600 flex-1 text-center">Sobre</div>
+                                <div class="pb-2 flex-1 text-center">Serviços</div>
+                                <div class="pb-2 flex-1 text-center">Avaliações</div>
+                                <div class="pb-2 flex-1 text-center">Trabalhos</div>
+                            </div>
+
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Profissional especialista com mais de ${prov.experience} de experiência no setor. Atendimento pontual com alta qualidade e garantia.
+                            </p>
+
+                            <!-- Metrics Badge -->
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                                    <div class="font-black text-sm text-slate-900">${prov.completedJobs}</div>
+                                    <div class="text-[9px] font-semibold text-slate-400">Serviços realizados</div>
+                                </div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                                    <div class="font-black text-sm text-slate-900">${prov.completionRate}</div>
+                                    <div class="text-[9px] font-semibold text-slate-400">Taxa de conclusão</div>
+                                </div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                                    <div class="font-black text-sm text-slate-900">${prov.experience}</div>
+                                    <div class="text-[9px] font-semibold text-slate-400">Experiência</div>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <button onclick="navigate('CHAT')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold p-3.5 rounded-xl shadow-md text-xs transition-all">
+                                    Abrir Chat / Contratar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'CLIENT_PROFILE':
+                    const client = state.clientUser;
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <!-- Top Header -->
+                            <div class="flex justify-between items-center">
+                                <h2 class="font-bold text-base text-slate-900">Meu Perfil</h2>
+                                <button onclick="showToast('Configurações salvas!')" class="text-xs font-semibold text-brand-600">
+                                    <i class="fa-solid fa-gear text-slate-500 text-base"></i>
+                                </button>
+                            </div>
+
+                            <!-- Client Info Profile Box -->
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center space-y-2 shadow-xs relative">
+                                <div class="relative w-20 h-20 mx-auto">
+                                    <img src="${client.avatar}" class="w-20 h-20 rounded-full object-cover border-2 border-brand-600 shadow-md">
+                                    <button class="absolute bottom-0 right-0 bg-brand-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] shadow-sm border-2 border-white">
+                                        <i class="fa-solid fa-camera"></i>
+                                    </button>
+                                </div>
+                                <h3 class="font-extrabold text-base text-slate-900">${client.name}</h3>
+                                <p class="text-xs text-slate-500">${client.email} • ${client.phone}</p>
+                                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold mt-1">
+                                    <i class="fa-solid fa-star text-amber-400"></i>
+                                    <span>${client.rating}</span>
+                                    <span class="text-amber-600 font-normal">• Cliente VIP</span>
+                                </div>
+                            </div>
+
+                            <!-- Usage Metrics Matrix -->
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                                    <div class="font-black text-lg text-brand-600">${client.totalRequests}</div>
+                                    <div class="text-[10px] font-semibold text-slate-400">Serviços solicitados</div>
+                                </div>
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                                    <div class="font-black text-lg text-emerald-600">${client.activeRequests}</div>
+                                    <div class="text-[10px] font-semibold text-slate-400">Serviços em andamento</div>
+                                </div>
+                            </div>
+
+                            <!-- Options List Group -->
+                            <div class="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 shadow-xs text-xs font-medium">
+                                <div onclick="navigate('PROPOSALS')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-brand-600 flex items-center justify-center">
+                                            <i class="fa-solid fa-clipboard-list"></i>
+                                        </div>
+                                        <span>Minhas Solicitações</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                                </div>
+
+                                <div onclick="showToast('Endereço principal: ' + state.clientUser.address)" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <div>Meus Endereços</div>
+                                            <div class="text-[10px] text-slate-400 font-normal truncate max-w-[200px]">${client.address}</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                                </div>
+
+                                <div onclick="showToast('Cartão de crédito Mastercard **** 4821')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                                            <i class="fa-solid fa-credit-card"></i>
+                                        </div>
+                                        <span>Formas de Pagamento</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                                </div>
+
+                                <div onclick="showToast('Central de ajuda e suporte aberta')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                                            <i class="fa-solid fa-headset"></i>
+                                        </div>
+                                        <span>Ajuda & Suporte</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                                </div>
+                            </div>
+
+                            <!-- Logout Button -->
+                            <button onclick="navigate('ONBOARDING'); showToast('Sua sessão foi encerrada.', false);" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold p-3.5 rounded-xl border border-red-100 text-xs flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Sair da Conta</span>
+                            </button>
+                        </div>
+                    `;
+                    break;
+
+                case 'CHAT':
+                    content.innerHTML = `
+                        <div class="screen-fade flex flex-col h-full bg-slate-100">
+                            <!-- Chat Header -->
+                            <div class="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between shadow-xs">
+                                <div class="flex items-center gap-3">
+                                    <button onclick="navigate('PROPOSALS')" class="text-slate-600">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
+                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200" class="w-9 h-9 rounded-full object-cover">
+                                    <div>
+                                        <h4 class="font-bold text-xs text-slate-900">Carlos Eletricista</h4>
+                                        <span class="text-[10px] text-emerald-500 font-semibold">• Online</span>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-ellipsis-vertical text-slate-400"></i>
+                            </div>
+
+                            <!-- Messages Scrollable Body -->
+                            <div id="chat-body" class="flex-1 p-4 overflow-y-auto space-y-3">
+                                <div class="text-center my-1">
+                                    <span class="bg-slate-200/80 text-slate-600 text-[10px] font-bold px-2.5 py-1 rounded-full">Hoje</span>
+                                </div>
+                                ${state.chatMessages.map(msg => `
+                                    <div class="flex flex-col ${msg.sender === 'client' ? 'items-end' : 'items-start'}">
+                                        <div class="${msg.sender === 'client' ? 'bg-brand-600 text-white rounded-2xl rounded-tr-xs' : 'bg-white text-slate-800 rounded-2xl rounded-tl-xs shadow-xs'} p-3 max-w-[80%] text-xs">
+                                            ${msg.text ? `<p>${msg.text}</p>` : ''}
+                                            ${msg.image ? `<img src="${msg.image}" class="rounded-xl mt-1 max-w-full">` : ''}
+                                        </div>
+                                        <span class="text-[9px] text-slate-400 mt-1 px-1">${msg.time}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <!-- Chat Input Bar -->
+                            <div class="bg-white p-3 border-t border-slate-200 flex items-center gap-2">
+                                <button class="text-slate-400 hover:text-slate-600">
+                                    <i class="fa-solid fa-paperclip text-sm"></i>
+                                </button>
+                                <input id="chat-input" type="text" placeholder="Digite uma mensagem..." class="flex-1 bg-slate-100 rounded-xl px-3 py-2 text-xs focus:outline-none" onkeypress="if(event.key === 'Enter') handleSendMessage()">
+                                <button onclick="handleSendMessage()" class="w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs shadow-xs">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    // Auto scroll chat to bottom
+                    setTimeout(() => {
+                        const body = document.getElementById('chat-body');
+                        if (body) body.scrollTop = body.scrollHeight;
+                    }, 50);
+                    break;
+            }
+
+            renderBottomNav();
+        }
+
+        function renderPrestadorScreen() {
+            const content = document.getElementById('screen-content');
+
+            switch (state.currentScreen) {
+                case 'HOME_PRESTADOR':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <!-- Header & Status Toggle -->
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="relative">
+                                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md">
+                                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-extrabold text-sm text-slate-900">Olá, Carlos! 👋</h3>
+                                        <p class="text-[10px] font-semibold text-slate-500">Nível Prata • 4.9 ⭐</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-1">
+                                    <div class="bg-white px-2.5 py-1.5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-2">
+                                        <span class="text-[9px] font-bold text-slate-600 uppercase tracking-wide">Online</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" ${state.providerOnline ? 'checked' : ''} onchange="state.providerOnline = this.checked; showToast(this.checked ? 'Você está online e visível!' : 'Você está offline.');" class="sr-only peer">
+                                            <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Radar Opportunities Banner -->
+                            <div class="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 rounded-2xl p-4 text-white shadow-lg shadow-emerald-600/30">
+                                <i class="fa-solid fa-satellite-dish absolute -right-4 -bottom-4 text-7xl text-white opacity-10 transform -rotate-12"></i>
+                                
+                                <div class="relative z-10 flex justify-between items-center">
+                                    <div>
+                                        <span class="inline-block bg-white/20 backdrop-blur-md text-[9px] uppercase tracking-wider font-extrabold text-white px-2 py-0.5 rounded-full mb-1">Radar de Oportunidades</span>
+                                        <h2 class="text-2xl font-black mt-0.5 tracking-tight flex items-center gap-2">
+                                            5 novos <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span></span>
+                                        </h2>
+                                        <p class="text-[10px] text-emerald-100 mt-1 font-medium"><i class="fa-solid fa-location-crosshairs mr-1"></i>Num raio de 10km</p>
+                                    </div>
+                                    <button onclick="navigate('OPPORTUNITIES')" class="bg-white text-emerald-700 hover:bg-emerald-50 transition-colors text-xs font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-1">
+                                        Ver <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Stats Matrix -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:-translate-y-0.5 transition-transform">
+                                    <div class="w-8 h-8 mx-auto bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-sm mb-1.5">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </div>
+                                    <div class="text-lg font-black text-slate-900 leading-none">12</div>
+                                    <div class="text-[9px] font-bold text-slate-400 mt-1">Enviadas</div>
+                                </div>
+                                <div onclick="navigate('MY_SERVICES')" class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                                    <div class="w-8 h-8 mx-auto bg-amber-50 text-amber-600 rounded-full flex items-center justify-center text-sm mb-1.5">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                    </div>
+                                    <div class="text-lg font-black text-slate-900 leading-none">${state.scheduledServices.length}</div>
+                                    <div class="text-[9px] font-bold text-slate-400 mt-1">Agendados</div>
+                                </div>
+                                <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:-translate-y-0.5 transition-transform">
+                                    <div class="w-8 h-8 mx-auto bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-sm mb-1.5">
+                                        <i class="fa-solid fa-award"></i>
+                                    </div>
+                                    <div class="text-lg font-black text-slate-900 leading-none">156</div>
+                                    <div class="text-[9px] font-bold text-slate-400 mt-1">Concluídos</div>
+                                </div>
+                            </div>
+
+                            <!-- Upcoming Jobs Section -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-extrabold text-sm text-slate-800">Próximos compromissos</h4>
+                                    <button onclick="navigate('MY_SERVICES')" class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg">Ver agenda completa (${state.scheduledServices.length})</button>
+                                </div>
+
+                                <div class="space-y-2">
+                                    ${state.scheduledServices.slice(0, 2).map(srv => `
+                                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-3 relative overflow-hidden">
+                                            <div class="absolute top-0 left-0 w-1 h-full ${srv.badgeColor}"></div>
+                                            <div class="flex justify-between items-start pl-2">
+                                                <div>
+                                                    <span class="bg-emerald-100 text-emerald-700 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded flex w-fit items-center gap-1 mb-1.5">
+                                                        <i class="fa-solid fa-circle text-[5px]"></i> Confirmado
+                                                    </span>
+                                                    <h5 class="text-xs font-bold text-slate-900">${srv.title}</h5>
+                                                    <p class="text-[10px] text-slate-500 mt-0.5"><i class="fa-regular fa-user mr-1"></i>Cliente: ${srv.clientName}</p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="font-black text-emerald-600 text-sm">${srv.price}</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-xl text-[10px] font-medium text-slate-600 pl-2">
+                                                <div class="flex items-center gap-1.5"><i class="fa-solid fa-calendar-day text-slate-400"></i>${srv.date}</div>
+                                                <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-slate-400"></i>${srv.time}</div>
+                                            </div>
+                                            
+                                            <div class="flex gap-2 pl-2">
+                                                <button onclick="showToast('Abrindo GPS para: ${srv.address}...')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold py-2 rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                                                    <i class="fa-solid fa-location-arrow text-emerald-600"></i> Ver Rota
+                                                </button>
+                                                <button onclick="navigate('CHAT')" class="w-10 h-10 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center transition-colors">
+                                                    <i class="fa-solid fa-comment-dots text-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'OPPORTUNITIES':
+                    const openReqs = state.requests.filter(r => r.status === 'Aberto');
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <button onclick="navigate('HOME_PRESTADOR')" class="w-8 h-8 rounded-full bg-slate-200/60 flex items-center justify-center text-slate-600 hover:bg-slate-300 transition-colors">
+                                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    </button>
+                                    <div>
+                                        <h2 class="font-bold text-base text-slate-900">Oportunidades</h2>
+                                        <p class="text-[10px] text-emerald-600 font-semibold">${openReqs.length} solicitações próximas</p>
+                                    </div>
+                                </div>
+                                <button class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-sliders text-xs"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                                <span class="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap shadow-sm">Todas</span>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-[10px] font-semibold px-3 py-1.5 rounded-full whitespace-nowrap">Urgentes 🚨</span>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-[10px] font-semibold px-3 py-1.5 rounded-full whitespace-nowrap">Elétrica</span>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-[10px] font-semibold px-3 py-1.5 rounded-full whitespace-nowrap">Hidráulica</span>
+                            </div>
+
+                            <div class="space-y-3">
+                                ${openReqs.map(req => `
+                                    <div class="bg-white p-3.5 rounded-2xl border ${req.isUrgent ? 'border-red-300 ring-2 ring-red-100 shadow-[0_4px_15px_-3px_rgba(239,68,68,0.2)]' : 'border-slate-200 shadow-sm'} flex flex-col gap-3 transition-transform hover:-translate-y-0.5">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex items-start gap-2.5">
+                                                <div class="w-10 h-10 rounded-xl ${req.isUrgent ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-600'} flex items-center justify-center text-lg shrink-0">
+                                                    <i class="fa-solid ${req.isUrgent ? 'fa-triangle-exclamation' : (req.category === 'Elétrica' ? 'fa-bolt' : 'fa-wrench')}"></i>
+                                                </div>
+                                                <div>
+                                                    ${req.isUrgent ? '<span class="inline-block bg-red-600 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded mb-1 tracking-wider">Emergência SOS</span>' : ''}
+                                                    <h4 class="font-bold text-xs text-slate-900 leading-tight pr-2">${req.title}</h4>
+                                                    <div class="text-[10px] text-slate-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                                                        <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot"></i>${req.distance}</span>
+                                                        <span class="flex items-center gap-1 ${req.isUrgent ? 'text-red-600 font-bold' : ''}"><i class="fa-regular fa-clock"></i>${req.date}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-[11px] text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100 line-clamp-2">
+                                            "${req.description}"
+                                        </p>
+                                        
+                                        <div class="flex items-center justify-between pt-1">
+                                            <div class="text-[10px] font-semibold text-slate-400">
+                                                Orçamento: <span class="${req.isUrgent ? 'text-red-600 font-bold' : 'text-slate-700 font-bold'}">${req.budget}</span>
+                                            </div>
+                                            <button onclick="navigate('SEND_PROPOSAL', { request: state.requests.find(r => r.id === '${req.id}') })" class="${req.isUrgent ? 'bg-red-600 hover:bg-red-700 shadow-red-500/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/30'} text-white text-[10px] font-bold px-4 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                                                Enviar Proposta <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'SEND_PROPOSAL':
+                    const propReq = state.selectedRequest || state.requests[0];
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex items-center gap-3 mb-2">
+                                <button onclick="navigate('OPPORTUNITIES')" class="w-8 h-8 rounded-full bg-slate-200/60 flex items-center justify-center text-slate-600 hover:bg-slate-300 transition-colors">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <div>
+                                    <h2 class="font-bold text-base text-slate-900">Enviar Proposta</h2>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-800 text-white p-4 rounded-2xl shadow-lg relative overflow-hidden">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="bg-white/20 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${propReq.category}</span>
+                                    ${propReq.isUrgent ? '<span class="bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 animate-pulse"><i class="fa-solid fa-bolt"></i> Urgente</span>' : ''}
+                                </div>
+                                <h3 class="font-bold text-sm leading-tight mb-2">${propReq.title}</h3>
+                                <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-300">
+                                    <div><i class="fa-solid fa-location-dot mr-1 text-slate-400"></i> ${propReq.location} (${propReq.distance})</div>
+                                    <div><i class="fa-regular fa-clock mr-1 text-slate-400"></i> ${propReq.date} • ${propReq.timeSlot}</div>
+                                </div>
+                                <div class="mt-3 p-2.5 bg-slate-900/50 rounded-xl text-[11px] text-slate-200 italic border border-slate-700/50">
+                                    "${propReq.description}"
+                                </div>
+                            </div>
+
+                            <form onsubmit="handleSendProposalSubmit(event)" class="space-y-3 pt-2">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Seu valor (Mão de obra)</label>
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-2.5 text-slate-400 text-xs font-bold">R$</span>
+                                            <input required type="number" placeholder="0,00" class="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-8 pr-3 text-sm font-black text-emerald-600 focus:outline-none focus:border-emerald-500 shadow-xs">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Tempo estimado</label>
+                                        <select class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-500 shadow-xs">
+                                            <option>Até 1 hora</option>
+                                            <option>1 a 3 horas</option>
+                                            <option>Meio período (4h)</option>
+                                            <option>Diária completa</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Mensagem para o cliente</label>
+                                    <textarea required rows="3" placeholder="Apresente-se brevemente e explique como vai resolver o problema. Mostre profissionalismo!" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-emerald-500 shadow-xs"></textarea>
+                                </div>
+
+                                <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex gap-3 items-start">
+                                    <i class="fa-solid fa-circle-info text-emerald-500 mt-0.5"></i>
+                                    <p class="text-[9px] text-emerald-800 leading-relaxed font-medium">O cliente valoriza respostas rápidas e claras. Se houver necessidade de peças extras, mencione na mensagem que os materiais serão orçados à parte.</p>
+                                </div>
+
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3.5 rounded-xl shadow-lg shadow-emerald-500/30 text-xs transition-all mt-4 flex items-center justify-center gap-2">
+                                    Enviar Proposta <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                    break;
+
+                case 'MY_SERVICES':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20 h-full flex flex-col">
+                            <div class="flex items-center justify-between">
+                                <h2 class="font-bold text-base text-slate-900">Meus Serviços</h2>
+                                <button class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex bg-slate-200/60 p-1 rounded-xl">
+                                <button class="flex-1 py-1.5 bg-white text-emerald-600 font-bold text-xs rounded-lg shadow-sm">
+                                    Agendados (${state.scheduledServices.length})
+                                </button>
+                                <button class="flex-1 py-1.5 text-slate-500 font-semibold text-xs rounded-lg hover:text-slate-700 transition-colors">
+                                    Concluídos (156)
+                                </button>
+                            </div>
+
+                            <!-- Schedule List (Exibe os 4 clientes) -->
+                            <div class="space-y-3 flex-1 overflow-y-auto no-scrollbar">
+                                ${state.scheduledServices.map(srv => `
+                                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden transition-all hover:border-emerald-300">
+                                        <div class="absolute top-0 left-0 w-1.5 h-full ${srv.badgeColor}"></div>
+                                        <div class="pl-2">
+                                            <div class="flex justify-between items-start mb-1.5">
+                                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                    <i class="fa-solid fa-calendar-day"></i> ${srv.date}, ${srv.time}
+                                                </span>
+                                                <span class="font-black text-emerald-600 text-xs">${srv.price}</span>
+                                            </div>
+                                            
+                                            <h4 class="font-bold text-xs text-slate-900 leading-snug">${srv.title}</h4>
+                                            
+                                            <div class="flex items-center gap-2.5 mt-2.5 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                                <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-black">
+                                                    ${srv.clientInitials}
+                                                </div>
+                                                <div class="overflow-hidden">
+                                                    <p class="text-[10px] font-bold text-slate-800 leading-none">${srv.clientName}</p>
+                                                    <p class="text-[9px] text-slate-500 mt-0.5 truncate">${srv.address}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="grid grid-cols-2 gap-2 mt-3">
+                                                <button onclick="navigate('CHAT')" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px] rounded-lg transition-colors">
+                                                    <i class="fa-solid fa-comment mr-1"></i> Chat
+                                                </button>
+                                                <button onclick="showToast('Iniciando navegação no GPS...')" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-lg shadow-xs transition-colors">
+                                                    <i class="fa-solid fa-location-arrow mr-1"></i> Rota
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'PROFILE_PRESTADOR':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex justify-between items-center">
+                                <h2 class="font-bold text-base text-slate-900">Meu Perfil Profissional</h2>
+                                <button onclick="showToast('Modo edição ativado')" class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-3xl border border-slate-200 text-center space-y-3 shadow-sm relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-16 bg-gradient-to-r from-emerald-500 to-teal-600 z-0"></div>
+                                
+                                <div class="relative z-10 pt-2">
+                                    <div class="relative w-24 h-24 mx-auto mb-2">
+                                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200" class="w-full h-full rounded-full object-cover border-4 border-white shadow-lg bg-white">
+                                        <button class="absolute bottom-0 right-0 bg-emerald-600 text-white w-7 h-7 rounded-full flex items-center justify-center border-2 border-white text-[10px] hover:bg-emerald-700 transition-colors">
+                                            <i class="fa-solid fa-camera"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <h3 class="font-extrabold text-lg text-slate-900 tracking-tight">Carlos Eletricista</h3>
+                                    <div class="flex items-center justify-center gap-2 mt-1">
+                                        <span class="inline-flex items-center gap-1 text-[9px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                                            <i class="fa-solid fa-certificate text-emerald-500"></i> Perfil Verificado
+                                        </span>
+                                    </div>
+
+                                    <p class="text-[11px] text-slate-500 leading-relaxed px-2 mt-3 font-medium">
+                                        Especialista em instalações elétricas residenciais e prediais com foco em segurança, rapidez e qualidade. Atendimento 24h para emergências.
+                                    </p>
+                                </div>
+
+                                <div class="flex justify-center gap-4 pt-4 mt-2 border-t border-slate-100 relative z-10">
+                                    <div class="text-center px-2">
+                                        <div class="font-black text-slate-900 text-base flex items-center justify-center gap-1">
+                                            4.9 <i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                                        </div>
+                                        <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Avaliação</div>
+                                    </div>
+                                    <div class="w-px h-8 bg-slate-200"></div>
+                                    <div class="text-center px-2">
+                                        <div class="font-black text-slate-900 text-base">156</div>
+                                        <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Serviços</div>
+                                    </div>
+                                    <div class="w-px h-8 bg-slate-200"></div>
+                                    <div class="text-center px-2">
+                                        <div class="font-black text-slate-900 text-base">8 anos</div>
+                                        <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Exp.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 space-y-2.5 shadow-sm">
+                                <div class="flex justify-between items-center mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-bolt text-[10px]"></i></div>
+                                        <h4 class="font-bold text-xs text-slate-800">Especialidades</h4>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold px-2.5 py-1 rounded-lg">Elétrica Geral</span>
+                                    <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold px-2.5 py-1 rounded-lg">Instalação de Chuveiros</span>
+                                    <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold px-2.5 py-1 rounded-lg">Iluminação LED</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 shadow-sm text-xs font-medium overflow-hidden">
+                                <div onclick="showToast('Carteira digital')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div>
+                                        <span>Minha Carteira & Ganhos</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                                </div>
+                                <div onclick="showToast('Central de suporte')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center"><i class="fa-solid fa-headset"></i></div>
+                                        <span>Ajuda & Suporte</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                                </div>
+                            </div>
+
+                            <button onclick="switchRole('CLIENTE'); showToast('Modo cliente ativado.');" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold p-3.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Mudar para Modo Cliente</span>
+                            </button>
+                        </div>
+                    `;
+                    break;
+            }
+
+            renderBottomNav();
+        }
+
+        function renderAdminScreen() {
+            const content = document.getElementById('screen-content');
+
+            switch (state.currentScreen) {
+                case 'ADMIN_DASHBOARD':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <!-- Admin Header -->
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-[9px] bg-indigo-100 text-indigo-700 font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Painel Gestor</span>
+                                    <h2 class="font-extrabold text-base text-slate-900 mt-0.5">Visão Geral da Plataforma</h2>
+                                </div>
+                                <button onclick="showToast('Relatório exportado em PDF!')" class="bg-indigo-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm hover:bg-indigo-700">
+                                    <i class="fa-solid fa-download mr-1"></i> Exportar
+                                </button>
+                            </div>
+
+                            <!-- Dashboard KPI Matrix -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Solicitações</span>
+                                        <i class="fa-solid fa-layer-group text-indigo-500"></i>
+                                    </div>
+                                    <div class="text-xl font-black text-slate-900 mt-1">${state.requests.length + 128}</div>
+                                    <span class="text-[9px] text-emerald-600 font-bold">▲ +14% este mês</span>
+                                </div>
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Prestadores</span>
+                                        <i class="fa-solid fa-user-gear text-emerald-500"></i>
+                                    </div>
+                                    <div class="text-xl font-black text-slate-900 mt-1">1.420</div>
+                                    <span class="text-[9px] text-emerald-600 font-bold">▲ 98% verificação</span>
+                                </div>
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Faturamento (GMV)</span>
+                                        <i class="fa-solid fa-money-bill-wave text-amber-500"></i>
+                                    </div>
+                                    <div class="text-xl font-black text-slate-900 mt-1">R$ 48,2k</div>
+                                    <span class="text-[9px] text-emerald-600 font-bold">▲ +18% este mês</span>
+                                </div>
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Satisfação</span>
+                                        <i class="fa-solid fa-star text-amber-400"></i>
+                                    </div>
+                                    <div class="text-xl font-black text-slate-900 mt-1">4.92 / 5</div>
+                                    <span class="text-[9px] text-slate-400 font-semibold">9.840 avaliações</span>
+                                </div>
+                            </div>
+
+                            <!-- Chart Canvas Container -->
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                                <h3 class="font-bold text-xs text-slate-800 mb-3">Volume de Serviços por Mês</h3>
+                                <div class="relative h-44 w-full">
+                                    <canvas id="admin-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Active Requests List -->
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-xs text-slate-800">Últimos Chamados em Tempo Real</h3>
+                                    <button onclick="navigate('ADMIN_REQUESTS')" class="text-[10px] text-indigo-600 font-bold">Ver todos</button>
+                                </div>
+                                ${state.requests.slice(0, 3).map(r => `
+                                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
+                                        <div>
+                                            <div class="font-bold text-slate-900">${r.title}</div>
+                                            <div class="text-[10px] text-slate-500">${r.category} • ${r.location}</div>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ${r.isUrgent ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}">
+                                            ${r.isUrgent ? 'SOS' : r.status}
+                                        </span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                    // Render Chart.js
+                    setTimeout(() => {
+                        const ctx = document.getElementById('admin-chart');
+                        if (ctx) {
+                            if (state.adminChartInstance) state.adminChartInstance.destroy();
+                            state.adminChartInstance = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                                    datasets: [{
+                                        label: 'Serviços Realizados',
+                                        data: [320, 450, 580, 710, 890, 1120],
+                                        borderColor: '#1d4ed8',
+                                        backgroundColor: 'rgba(29, 78, 216, 0.08)',
+                                        fill: true,
+                                        tension: 0.4
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { display: false } },
+                                    scales: {
+                                        x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+                                        y: { ticks: { font: { size: 9 } } }
+                                    }
+                                }
+                            });
+                        }
+                    }, 50);
+                    break;
+
+                case 'ADMIN_REQUESTS':
+                    content.innerHTML = `
+                        <div class="screen-fade p-4 space-y-4 pb-20">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <button onclick="navigate('ADMIN_DASHBOARD')" class="w-8 h-8 rounded-full bg-slate-200/60 flex items-center justify-center text-slate-600">
+                                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    </button>
+                                    <h2 class="font-bold text-base text-slate-900">Gestão de Chamados</h2>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                ${state.requests.map(r => `
+                                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="font-black text-indigo-600">${r.id}</span>
+                                            <span class="px-2 py-0.5 rounded text-[9px] font-bold ${r.status === 'Concluído' ? 'bg-slate-100 text-slate-600' : 'bg-emerald-100 text-emerald-700'}">${r.status}</span>
+                                        </div>
+                                        <h4 class="font-bold text-xs text-slate-900">${r.title}</h4>
+                                        <p class="text-[10px] text-slate-500">${r.location}</p>
+                                        <div class="flex justify-end gap-2 pt-1">
+                                            <button onclick="showToast('Status atualizado pelo Admin!')" class="px-3 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-lg hover:bg-slate-200">
+                                                Moderar
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            renderBottomNav();
+        }
+
+        function renderBottomNav() {
+            const nav = document.getElementById('bottom-nav');
+            if (!nav) return;
+
+            if (state.currentRole === 'CLIENTE') {
+                nav.innerHTML = `
+                    <button onclick="navigate('HOME')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'HOME' ? 'text-brand-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-house text-base"></i>
+                        <span class="text-[9px]">Início</span>
+                    </button>
+                    <button onclick="navigate('PROPOSALS')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'PROPOSALS' ? 'text-brand-600 font-bold' : 'text-slate-400'} relative">
+                        <i class="fa-solid fa-list-check text-base"></i>
+                        <span class="text-[9px]">Pedidos</span>
+                        <span class="absolute top-0 right-1 w-2 h-2 bg-emerald-500 rounded-full"></span>
+                    </button>
+                    <button onclick="state.isUrgentMode=false; navigate('NEW_REQUEST');" class="flex flex-col items-center justify-center -mt-5 bg-brand-600 text-white w-12 h-12 rounded-full shadow-lg shadow-brand-600/40 hover:scale-105 transition-all">
+                        <i class="fa-solid fa-plus text-lg"></i>
+                    </button>
+                    <button onclick="navigate('CHAT')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'CHAT' ? 'text-brand-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-comments text-base"></i>
+                        <span class="text-[9px]">Chat</span>
+                    </button>
+                    <button onclick="navigate('CLIENT_PROFILE')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'CLIENT_PROFILE' ? 'text-brand-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-user text-base"></i>
+                        <span class="text-[9px]">Perfil</span>
+                    </button>
+                `;
+            } else if (state.currentRole === 'PRESTADOR') {
+                nav.innerHTML = `
+                    <button onclick="navigate('HOME_PRESTADOR')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'HOME_PRESTADOR' ? 'text-emerald-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-chart-pie text-base"></i>
+                        <span class="text-[9px]">Início</span>
+                    </button>
+                    <button onclick="navigate('OPPORTUNITIES')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'OPPORTUNITIES' || state.currentScreen === 'SEND_PROPOSAL' ? 'text-emerald-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-satellite-dish text-base"></i>
+                        <span class="text-[9px]">Radar</span>
+                    </button>
+                    <button onclick="navigate('MY_SERVICES')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'MY_SERVICES' ? 'text-emerald-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-briefcase text-base"></i>
+                        <span class="text-[9px]">Serviços</span>
+                    </button>
+                    <button onclick="navigate('PROFILE_PRESTADOR')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'PROFILE_PRESTADOR' ? 'text-emerald-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-id-card text-base"></i>
+                        <span class="text-[9px]">Meu Perfil</span>
+                    </button>
+                `;
+            } else if (state.currentRole === 'ADMIN') {
+                nav.innerHTML = `
+                    <button onclick="navigate('ADMIN_DASHBOARD')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'ADMIN_DASHBOARD' ? 'text-indigo-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-chart-line text-base"></i>
+                        <span class="text-[9px]">Dashboard</span>
+                    </button>
+                    <button onclick="navigate('ADMIN_REQUESTS')" class="flex flex-col items-center gap-1 ${state.currentScreen === 'ADMIN_REQUESTS' ? 'text-indigo-600 font-bold' : 'text-slate-400'}">
+                        <i class="fa-solid fa-list-check text-base"></i>
+                        <span class="text-[9px]">Chamados</span>
+                    </button>
+                `;
+            }
+        }
+
+        function render() {
+            if (state.currentRole === 'CLIENTE') {
+                renderClienteScreen();
+            } else if (state.currentRole === 'PRESTADOR') {
+                renderPrestadorScreen();
+            } else if (state.currentRole === 'ADMIN') {
+                renderAdminScreen();
+            }
+        }
+
+        window.onload = function() {
+            render();
+        };
+    </script>
+</body>
+</html>
