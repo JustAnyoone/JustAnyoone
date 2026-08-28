@@ -11,47 +11,47 @@
 
 ---
 
-## Sobre Mim
+## About Me
 
-> *"Estejam vigilantes, permaneçam firmes na fé, sejam corajosos, sejam fortes. Façam tudo com amor." — 1 Coríntios 16:13-14 (NVI)*
+> *"Be on your guard; stand firm in the faith; be courageous; be strong. Do everything in love." — 1 Corinthians 16:13-14 (NIV)*
 
-Olá, Me chamo **Portilho**, estudante de **Ciência da Computação** no **UniCEUB**. Apaixonado por tecnologia, desenvolvimento de software, inteligência artificial e resolução de problemas complexos através de código. Este repositório reúne minha trajetória acadêmica e projetos pessoais, refletindo meu crescimento contínuo como profissional de TI.
+Hello, my name is **Portilho**, a **Computer Science** student at **UniCEUB**. Passionate about technology, software development, artificial intelligence, and solving complex problems through code. This repository gathers my academic journey and personal projects, reflecting my continuous growth as an IT professional.
 
-- Cursando **Ciência da Computação** — UniCEUB, 2º semestre
-- Localização: Brasília, DF, Brasil
-- Inglês: Intermediário
-- Especializando: **Java**
-- Disponível para: Estágios
+- Currently studying **Computer Science** — UniCEUB, 2nd semester
+- Location: Brasília, DF, Brazil
+- English: Intermediate
+- Specializing in: **Java**
+- Available for: Internships (part-time/remote)
 
 ---
 
-## Estrutura do Repositório
-
+## Repository Structure
 ```
 portfolio/
-├── academico/          # Projetos desenvolvidos durante a graduação
-│   ├── semestre-01/
-│   ├── semestre-02/
-│   └── tcc/
-├── pessoal/            # Projetos de iniciativa própria
+├── academic/            # Projects developed during undergraduate studies
+│   ├── semester-01/
+│   ├── semester-02/
+│   └── thesis/
+├── personal/            # Self-initiated projects
 │   ├── Java/
-│   └── experimentos/
-└── README.md           # Este arquivo
+│   └── experiments/
+└── README.md            # This file
 ```
 
 ---
 
-## Projetos
+## Projects
 
-Este repositório está em construção. Os projetos serão adicionados ao longo da graduação.
+This repository is under construction. Projects will be added throughout my undergraduate studies.
 
 ---
 
-## Stack de Tecnologias
+## Tech Stack
 
 <div align="center">
 
-### Linguagens
+### Languages
+
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
@@ -59,7 +59,8 @@ Este repositório está em construção. Os projetos serão adicionados ao longo
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
-### Ferramentas e Plataformas
+### Tools and Platforms
+
 ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)
 ![VS Code](https://img.shields.io/badge/VS%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white)
@@ -68,14 +69,14 @@ Este repositório está em construção. Os projetos serão adicionados ao longo
 
 ---
 
-## Contato
+## Contact
 
 <div align="center">
 
-| Canal | Link |
-|-------|------|
+| Channel | Link |
+|---------|------|
 | LinkedIn | [linkedin.com/in/rhyan-portilho](https://www.linkedin.com/in/rhyan-portilho-60305b343/) |
-| E-mail | [rhyan.portilho@gmail.com](mailto:rhyan.portilho@gmail.com) |
+| Email | [rhyan.portilho@gmail.com](mailto:rhyan.portilho@gmail.com) |
 | GitHub | [@JustAnyoone](https://github.com/JustAnyoone) |
 
 </div>
@@ -84,7 +85,7 @@ Este repositório está em construção. Os projetos serão adicionados ao longo
 
 <div align="center">
 
-*Feito com dedicação por **Portilho***
+*Made with dedication by **Portilho***
 
 ![Visitors](https://visitor-badge.laobi.icu/badge?page_id=JustAnyoone.JustAnyoone)
 
